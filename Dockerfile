@@ -24,22 +24,22 @@ FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy backend
-COPY --from=backend-builder /app/backend /app/backend
+# Copy Python packages from builder
+COPY --from=backend-builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
+
+# Copy backend code
 COPY backend/ /app/backend/
 
 # Copy frontend build
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
 
-# Install nginx to serve frontend
-RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
-
-# Configure nginx
-RUN mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+# Configure nginx to run as root
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 8000 80
