@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: location-tracking-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: MQTT_BROKER
+        value: mosquitto
+      - key: MQTT_PORT
+        value: "1883"
+      - key: DATABASE_URL
+        value: sqlite:///./location_data.db
+      - key: SERVER_HOST
+        value: 0.0.0.0
+      - key: SERVER_PORT
+        value: "8000"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+
+  - type: web
+    name: location-tracking-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: VITE_API_URL
+        value: https://location-tracking-backend.onrender.com
